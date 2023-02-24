@@ -7,8 +7,8 @@ on:
 env:
   registry: ghcr.io
   app_image: ghcr.io/mcelal-${{ github.repository }}:latest
-  ssh_username: root
-  ssh_privatekey: ${{ secrets.SERVER_PRIVATEKEY }}
+  ssh_username: ${{ secrets.SSH_USERNAME }}
+  ssh_privatekey: ${{ secrets.SSH_KEY }}
   #ssh_hosts: ${{ join(fromJSON(vars.APP_HOSTS)) }}
   #cmd_host: ${{ fromJSON(vars.APP_HOSTS)[0] }}
   app_envs: test

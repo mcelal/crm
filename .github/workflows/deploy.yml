@@ -17,7 +17,7 @@ jobs:
   build:
     # Configuration
     name: Image Build & Push GHCR
-    runs-on: buildjet-4vcpu-ubuntu-2204-arm
+    runs-on: ubuntu-22.04
     permissions:
       contents: read
       packages: write
@@ -47,7 +47,7 @@ jobs:
   deploy:
     needs: build
     name: Deploy to Servers
-    runs-on: buildjet-4vcpu-ubuntu-2204-arm
+    runs-on: ubuntu-22.04
     steps:
       - name: Stop Servers && Update Images
         uses: appleboy/ssh-action@v0.1.7

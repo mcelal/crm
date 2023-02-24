@@ -57,6 +57,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           sync: true
           script: |
+            echo ${{ secrets.ACCESS_TOKEN }} | docker login ${{ env.registry }} -u ${{ github.actor }} --password-stdin
             docker stop -t 120 $(docker ps -aq) || true && docker rm $(docker ps -aq) || true
             docker pull ${{ env.app_image }}
             echo -e "${{ env.app_envs }}" > .env

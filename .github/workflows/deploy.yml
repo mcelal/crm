@@ -3,27 +3,77 @@ name: Deploy
 on:
   push:
     branches: [master]
+
+env:
+  registry: ghcr.io
+  app_image: ghcr.io/mcelal-${{ github.repository }}:latest
+  ssh_username: root
+  ssh_privatekey: ${{ secrets.SERVER_PRIVATEKEY }}
+  ssh_hosts: ${{ join(fromJSON(vars.APP_HOSTS)) }}
+  cmd_host: ${{ fromJSON(vars.APP_HOSTS)[0] }}
+  app_envs: ${{ join(fromJSON(vars.APP_ENVS), '\n') }}
+
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  build:
+    # Configuration
+    name: Image Build & Push GHCR
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+
+    # Steps
     steps:
-      - uses: shivammathur/setup-php@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
         with:
-          php-version: '8.1'
-      - uses: actions/checkout@v2
-      - name: Deploy to Server
-        if: ${{ success() }}
-        uses: appleboy/ssh-action@master
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.ACCESS_TOKEN }}
+      - name: Build & Push
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ env.app_image }}
+          labels: org.opencontainers.image.source="${{ github.event.repository.clone_url }}"
+
+  deploy:
+    needs: build
+    name: Deploy to Servers
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Stop Servers && Update Images
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          script_stop: true
+          sync: true
           script: |
-            cd apps
-            cd laravel-example
-            git pull
-            npm ci
-            npm run prod
-            composer i
-            php artisan migrate --force
+            docker stop -t 120 $(docker ps -aq) || true && docker rm $(docker ps -aq) || true
+            docker pull ${{ env.app_image }}
+            echo -e "${{ env.app_envs }}" > .env
+      - name: Run App Commands
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: docker run --env-file .env --rm ${{ env.app_image }} sh -c "bin/console doctrine:schema:update --force --complete" || true
+      - name: Start Servers
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          sync: true
+          script: |
+            docker run -d -p 80:80 --restart always --env-file .env --log-opt max-size=1g ${{ env.app_image }}
+            docker rmi $(docker images -q -f 'dangling=true') || true

@@ -57,10 +57,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           sync: true
           script: |
-            sudo su
-            echo ${{ secrets.ACCESS_TOKEN }} | docker login ${{ env.registry }} -u ${{ github.actor }} --password-stdin
-            docker stop -t 120 $(docker ps -aq) || true && docker rm $(docker ps -aq) || true
-            docker pull ${{ env.app_image }}
+            echo ${{ secrets.ACCESS_TOKEN }} | sudo docker login ${{ env.registry }} -u ${{ github.actor }} --password-stdin
+            sudo docker stop -t 120 $(docker ps -aq) || true && sudo docker rm $(docker ps -aq) || true
+            sudo docker pull ${{ env.app_image }}
             echo -e "${{ env.app_envs }}" > .env
       - name: Start Servers
         uses: appleboy/ssh-action@v0.1.7
@@ -70,6 +69,5 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           sync: true
           script: |
-            sudo su
-            docker run -d -p 80:80 --restart always --env-file .env --log-opt max-size=1g ${{ env.app_image }}
-            docker rmi $(docker images -q -f 'dangling=true') || true
+            sudo docker run -d -p 80:80 --restart always --env-file .env --log-opt max-size=1g ${{ env.app_image }}
+            sudo docker rmi $(docker images -q -f 'dangling=true') || true

@@ -6,7 +6,7 @@ on:
 
 env:
   registry: ghcr.io
-  app_image: ghcr.io/mcelal-${{ github.repository }}:latest
+  app_image: ghcr.io/${{ github.repository }}:latest
   ssh_username: ${{ secrets.SSH_USERNAME }}
   ssh_privatekey: ${{ secrets.SSH_KEY }}
   #ssh_hosts: ${{ join(fromJSON(vars.APP_HOSTS)) }}

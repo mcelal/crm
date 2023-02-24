@@ -9,9 +9,9 @@ env:
   app_image: ghcr.io/mcelal-${{ github.repository }}:latest
   ssh_username: root
   ssh_privatekey: ${{ secrets.SERVER_PRIVATEKEY }}
-  ssh_hosts: ${{ join(fromJSON(vars.APP_HOSTS)) }}
-  cmd_host: ${{ fromJSON(vars.APP_HOSTS)[0] }}
-  app_envs: ${{ join(fromJSON(vars.APP_ENVS), '\n') }}
+  #ssh_hosts: ${{ join(fromJSON(vars.APP_HOSTS)) }}
+  #cmd_host: ${{ fromJSON(vars.APP_HOSTS)[0] }}
+  app_envs: test
 
 jobs:
   build:

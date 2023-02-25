@@ -1,43 +1,29 @@
-# Use official composer library to move the composer binary to the PHP container
-FROM composer:latest AS composer
+FROM openswoole/swoole:latest
 
-FROM php:8.1.16-apache
+### Install Extensions
+#RUN docker-php-ext-install
+#RUN apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS imagemagick-dev libtool \
+#    && pecl install imagick && docker-php-ext-enable imagick
 
-RUN apt update -y
+### PHP Config
+RUN touch "$PHP_INI_DIR/conf.d/custom.ini" \
+    && echo "max_file_uploads=50;" >> "$PHP_INI_DIR/conf.d/custom.ini" \
+    && echo "post_max_size=20M;" >> "$PHP_INI_DIR/conf.d/custom.ini" \
+    && echo "upload_max_filesize=20M;" >> "$PHP_INI_DIR/conf.d/custom.ini" \
+    && echo "memory_limit=256M;" >> "$PHP_INI_DIR/conf.d/custom.ini" \
+    && echo "realpath_cache_size=16M;" >> "$PHP_INI_DIR/conf.d/custom.ini" \
+    && echo "realpath_cache_ttl=600;" >> "$PHP_INI_DIR/conf.d/custom.ini"
 
-# Install the PHP extension installer that will install and configure the extension, but will also install all dependencies.
-ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
+### Copy App
+COPY . /app
+WORKDIR /app
 
-# Install the ZIP extension since Composer requires it
-RUN chmod uga+x /usr/local/bin/install-php-extensions && sync && \
-    install-php-extensions zip
-
-# Copy the composer binary to the container
-COPY --from=composer /usr/bin/composer /usr/bin/composer
-# Set composer home directory
-ENV COMPOSER_HOME=/.composer
-# Composer needs to run as root to allow the use of a bind-mounted cache volume
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Enable headers/rewrite module for Apache
-RUN a2enmod headers rewrite
+### Install Composer Dependency
+RUN composer install --no-dev \
+    && composer require laravel/octane \
+    && php artisan octane:install --server=swoole
 
-# Set document root for Apache
-ENV APACHE_DOCUMENT_ROOT /var/www/html
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-# Create the project root folder and assign ownership to the pre-existing www-data user
-RUN mkdir -p /var/www/html /.composer && chown -R www-data:www-data /var/www/html
-
-WORKDIR /var/www/html
-
-# Copy the rest of the source code to the container. Now, if source files are changed, the cache-layer
-# breaks here and the only the 'composer dump-autoload' command will have to run again.
-COPY --chown=www-data . /var/www/html/
-
-# Generate an optimized autoloader after copying the source files to the container
-# RUN composer dump-autoload --optimize
-
-# Change ownership of the root folder to www-data
-# RUN chown -R www-data:www-data vendor/
+CMD ["php", "artisan octane:start --server=swoole --host=0.0.0.0 --port=80"]
+EXPOSE 80

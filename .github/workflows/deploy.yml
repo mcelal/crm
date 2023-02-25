@@ -58,7 +58,7 @@ jobs:
           sync: true
           script: |
             echo ${{ secrets.ACCESS_TOKEN }} | sudo docker login ${{ env.registry }} -u ${{ github.actor }} --password-stdin
-            sudo docker stop -t 120 $(docker ps -aq) || true && sudo docker rm $(docker ps -aq) || true
+            sudo docker stop -t 120 $(sudo docker ps -aq) || true && sudo docker rm $(docker ps -aq) || true
             sudo docker pull ${{ env.app_image }}
             echo -e "${{ env.app_envs }}" > .env
       - name: Start Servers

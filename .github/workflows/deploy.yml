@@ -1,0 +1,73 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+
+env:
+  registry: ghcr.io
+  app_image: ghcr.io/${{ github.repository }}:latest
+  ssh_username: ${{ secrets.SSH_USERNAME }}
+  ssh_privatekey: ${{ secrets.SSH_KEY }}
+  #ssh_hosts: ${{ join(fromJSON(vars.APP_HOSTS)) }}
+  #cmd_host: ${{ fromJSON(vars.APP_HOSTS)[0] }}
+  app_envs: test
+
+jobs:
+  build:
+    # Configuration
+    name: Image Build & Push GHCR
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+
+    # Steps
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.ACCESS_TOKEN }}
+      - name: Build & Push
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ env.app_image }}
+          labels: org.opencontainers.image.source="${{ github.event.repository.clone_url }}"
+
+  deploy:
+    needs: build
+    name: Deploy to Servers
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Stop Servers && Update Images
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          sync: true
+          script: |
+            echo ${{ secrets.ACCESS_TOKEN }} | sudo docker login ${{ env.registry }} -u ${{ github.actor }} --password-stdin
+            sudo docker stop -t 120 $(sudo docker ps -aq) || true && sudo docker rm $(docker ps -aq) || true
+            sudo docker pull ${{ env.app_image }}
+            echo -e "${{ env.app_envs }}" > .env
+      - name: Start Servers
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          sync: true
+          script: |
+            sudo docker run -d -p 80:80 --restart always --env-file .env --log-opt max-size=1g ${{ env.app_image }}
+            sudo docker rmi $(docker images -q -f 'dangling=true') || true

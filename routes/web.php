@@ -18,6 +18,7 @@ Route::get('/', function () {
 });
 
 Route::get('ping', function () {
+    ds('test');
     return response()->json([
         'status' => 'success',
     ]);

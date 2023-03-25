@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "78d9419d0b27b02386ebe1af7f19a137",
+    "content-hash": "f2cb47b69f4224c2753ac4d3b5fcda00",
     "packages": [
         {
             "name": "brick/math",
@@ -6092,47 +6092,43 @@
             "time": "2020-07-09T08:09:16+00:00"
         },
         {
-            "name": "laradumps/laradumps",
-            "version": "v1.9.3",
+            "name": "laravel/breeze",
+            "version": "v1.19.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/laradumps/laradumps.git",
-                "reference": "0db48329b4df6a4a6533365c49380ad01cd39be9"
+                "url": "https://github.com/laravel/breeze.git",
+                "reference": "725e0c4fb1f630afdd90b5fba2a7f6d8d547ac29"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laradumps/laradumps/zipball/0db48329b4df6a4a6533365c49380ad01cd39be9",
-                "reference": "0db48329b4df6a4a6533365c49380ad01cd39be9",
+                "url": "https://api.github.com/repos/laravel/breeze/zipball/725e0c4fb1f630afdd90b5fba2a7f6d8d547ac29",
+                "reference": "725e0c4fb1f630afdd90b5fba2a7f6d8d547ac29",
                 "shasum": ""
             },
             "require": {
-                "nunomaduro/termwind": "^1.12",
-                "php": "^8.0"
+                "illuminate/console": "^9.21|^10.0",
+                "illuminate/filesystem": "^9.21|^10.0",
+                "illuminate/support": "^9.21|^10.0",
+                "illuminate/validation": "^9.21|^10.0",
+                "php": "^8.0.2"
             },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.8",
-                "illuminate/console": "^8.18 | ^9.0",
-                "illuminate/mail": "^8.18 | ^9.0",
-                "illuminate/support": "^8.18 | ^9.0",
-                "nunomaduro/larastan": "^1.0 | ^2.1",
-                "orchestra/testbench": "^6.17 | ^7.0",
-                "pestphp/pest": "^1.21",
-                "symfony/var-dumper": "^5.4 | ^6.0"
+            "conflict": {
+                "laravel/framework": "<9.37.0"
             },
             "type": "library",
             "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                },
                 "laravel": {
                     "providers": [
-                        "LaraDumps\\LaraDumps\\LaraDumpsServiceProvider"
+                        "Laravel\\Breeze\\BreezeServiceProvider"
                     ]
                 }
             },
             "autoload": {
-                "files": [
-                    "src/functions.php"
-                ],
                 "psr-4": {
-                    "LaraDumps\\LaraDumps\\": "src/"
+                    "Laravel\\Breeze\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -6141,24 +6137,20 @@
             ],
             "authors": [
                 {
-                    "name": "Luan Freitas",
-                    "email": "luanfreitas10@protonmail.com",
-                    "role": "Developer"
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
                 }
             ],
-            "description": "A Dump Component for Laravel.",
-            "homepage": "https://github.com/laradumps/laradumps",
+            "description": "Minimal Laravel authentication scaffolding with Blade and Tailwind.",
+            "keywords": [
+                "auth",
+                "laravel"
+            ],
             "support": {
-                "issues": "https://github.com/laradumps/laradumps/issues",
-                "source": "https://github.com/laradumps/laradumps/tree/v1.9.3"
+                "issues": "https://github.com/laravel/breeze/issues",
+                "source": "https://github.com/laravel/breeze"
             },
-            "funding": [
-                {
-                    "url": "https://github.com/luanfreitasdev",
-                    "type": "github"
-                }
-            ],
-            "time": "2023-03-02T20:57:40+00:00"
+            "time": "2023-02-18T20:55:43+00:00"
         },
         {
             "name": "laravel/pint",

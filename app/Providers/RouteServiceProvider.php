@@ -17,7 +17,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/dashboard';
+    public const HOME = '/panel/dashboard';
 
     /**
      * Define your route model bindings, pattern filters, and other route configuration.
@@ -30,6 +30,8 @@ class RouteServiceProvider extends ServiceProvider
             $this->mapApiRoutes();
 
             $this->mapWebRoutes();
+
+            $this->mapPanelRoutes();
         });
     }
 
@@ -41,6 +43,18 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+    }
+
+    protected function mapPanelRoutes()
+    {
+        foreach ($this->centralDomains() as $domain) {
+            Route::middleware(['web', 'verified'])
+                ->domain($domain)
+                ->prefix('panel')
+                ->name('panel.')
+                ->namespace($this->namespace)
+                ->group(base_path('routes/panel.php'));
+        }
     }
 
     protected function mapWebRoutes()

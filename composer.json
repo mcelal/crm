@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "filament/filament": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.0",
         "laravel/octane": "^1.4",
@@ -17,6 +18,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.8",
+        "doctrine/dbal": "^3.6",
         "fakerphp/faker": "^1.9.1",
         "laradumps/laradumps": "^1.9",
         "laravel/breeze": "^1.19",
@@ -45,7 +47,8 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@php artisan filament:upgrade"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

@@ -47,14 +47,11 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapPanelRoutes()
     {
-        foreach ($this->centralDomains() as $domain) {
-            Route::middleware(['web', 'verified'])
-                ->domain($domain)
-                ->prefix('panel')
-                ->name('panel.')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/panel.php'));
-        }
+        Route::middleware(['web', 'verified'])
+            ->prefix('panel')
+            ->name('panel.')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/panel.php'));
     }
 
     protected function mapWebRoutes()

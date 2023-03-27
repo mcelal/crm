@@ -34,13 +34,23 @@ class TenantResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label(__('Tenant'))
+                    ->translateLabel('Tenant')
                     ->searchable()
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('domains_count')
-                    ->label(__('Domain Count')),
+                    ->translateLabel('Domain Count'),
+
+                Tables\Columns\TextColumn::make('tenancy_db_name')
+                    ->label(__('DB Name')),
+
+                Tables\Columns\TextColumn::make('db_size')
+                    ->label(__('DB Size')),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
+                    ->sortable()
+                    ->since(),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(),
             ])

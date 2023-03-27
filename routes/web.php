@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return redirect()->route('panel.dashboard');
+    return redirect()->route('filament.pages.dashboard');
 });
 
 require __DIR__.'/auth.php';

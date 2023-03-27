@@ -12,7 +12,9 @@ class StatsOverview extends BaseWidget
     protected function getCards(): array
     {
         return [
-            Card::make('Total Tenant', Tenant::query()->count()),
+            Card::make('Total Tenant', Tenant::query()->count())
+                ->url(route('filament.resources.tenants.index')),
+
             Card::make('Total User', User::query()->count()),
         ];
     }

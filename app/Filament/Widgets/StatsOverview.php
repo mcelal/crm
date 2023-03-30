@@ -15,7 +15,8 @@ class StatsOverview extends BaseWidget
             Card::make('Total Tenant', Tenant::query()->count())
                 ->url(route('filament.resources.tenants.index')),
 
-            Card::make('Total User', User::query()->count()),
+            Card::make('Total User', User::query()->count())
+                ->url(route('filament.resources.users.index')),
         ];
     }
 }

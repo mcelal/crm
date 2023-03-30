@@ -16,4 +16,9 @@ class EditTenant extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): ?string
+    {
+        return self::$resource::getUrl('index');
+    }
 }

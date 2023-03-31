@@ -17,8 +17,7 @@ class ListTenants extends ListRecords
     {
         return Tenant::query()
             ->addSelect('*')
-            ->addSelect(DB::raw('(SELECT PG_SIZE_PRETTY(PG_DATABASE_SIZE(tenants.data ->> \'tenancy_db_name\'))) as "db_size"'))
-            ->withCount('domains');
+            ->addSelect(DB::raw('(SELECT PG_SIZE_PRETTY(PG_DATABASE_SIZE(tenants.data ->> \'tenancy_db_name\'))) as "db_size"'));
     }
 
     protected function getActions(): array

@@ -48,6 +48,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapPanelRoutes()
     {
         Route::middleware(['web', 'verified'])
+            ->domain(env('FILAMENT_DOMAIN'))
             ->prefix('panel')
             ->name('panel.')
             ->namespace($this->namespace)

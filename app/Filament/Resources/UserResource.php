@@ -98,4 +98,14 @@ class UserResource extends Resource
             'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
     }
+
+    protected static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    protected static function getNavigationSort(): ?int
+    {
+        return 20;
+    }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TenantResource\Pages;
-use App\Filament\Resources\TenantResource\RelationManagers;
-use App\Models\Tenant;
+use App\Filament\Resources\DomainResource\Pages;
+use App\Filament\Resources\DomainResource\RelationManagers;
+use App\Models\Domain;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -13,9 +13,9 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class TenantResource extends Resource
+class DomainResource extends Resource
 {
-    protected static ?string $model = Tenant::class;
+    protected static ?string $model = Domain::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
@@ -23,8 +23,13 @@ class TenantResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('id')
+                Forms\Components\Select::make('tenant_id')
                     ->required()
+                    ->relationship('tenant', 'id'),
+
+                Forms\Components\TextInput::make('domain')
+                    ->required()
+                    ->unique(column: 'domain')
                     ->maxLength(255),
             ]);
     }
@@ -33,26 +38,10 @@ class TenantResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('Tenant')
-                    ->searchable()
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('domains_count')
-                    ->sortable()
-                    ->label('Total Domains')
-                    ->counts('domains'),
-
-                Tables\Columns\TextColumn::make('tenancy_db_name')
-                    ->label(__('DB Name')),
-
-                Tables\Columns\TextColumn::make('db_size')
-                    ->label(__('DB Size')),
-
+                Tables\Columns\TextColumn::make('tenant.id'),
+                Tables\Columns\TextColumn::make('domain'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->sortable()
-                    ->since(),
-
+                    ->dateTime(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(),
             ])
@@ -60,10 +49,7 @@ class TenantResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                ]),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -80,9 +66,9 @@ class TenantResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTenants::route('/'),
-            'create' => Pages\CreateTenant::route('/create'),
-            'edit' => Pages\EditTenant::route('/{record}/edit'),
+            'index'  => Pages\ListDomains::route('/'),
+            'create' => Pages\CreateDomain::route('/create'),
+            'edit'   => Pages\EditDomain::route('/{record}/edit'),
         ];
     }
 
@@ -93,6 +79,6 @@ class TenantResource extends Resource
 
     protected static function getNavigationSort(): ?int
     {
-        return 10;
+        return 1;
     }
 }

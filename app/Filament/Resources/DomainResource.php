@@ -17,7 +17,9 @@ class DomainResource extends Resource
 {
     protected static ?string $model = Domain::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
+
+    protected static ?string $navigationGroup = 'Tenancy';
 
     public static function form(Form $form): Form
     {
@@ -38,12 +40,22 @@ class DomainResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('tenant.id'),
-                Tables\Columns\TextColumn::make('domain'),
+                Tables\Columns\TextColumn::make('tenant.id')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('domain')
+                    ->searchable()
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
+                    ->since()
+                    ->sortable()
+                    ->tooltip(fn(Domain $record): string => $record->created_at),
+
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
+                    ->since()
+                    ->sortable()
+                    ->tooltip(fn(Domain $record): string => $record->updated_at),
             ])
             ->filters([
                 //
@@ -79,6 +91,6 @@ class DomainResource extends Resource
 
     protected static function getNavigationSort(): ?int
     {
-        return 1;
+        return 2;
     }
 }

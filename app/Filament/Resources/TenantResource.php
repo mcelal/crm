@@ -19,11 +19,14 @@ class TenantResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
+    protected static ?string $navigationGroup = 'Tenancy';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('id')
+                    ->label('Name')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -47,14 +50,13 @@ class TenantResource extends Resource
                     ->label(__('DB Name')),
 
                 Tables\Columns\TextColumn::make('db_size')
-                    ->label(__('DB Size')),
+                    ->label(__('DB Size'))
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
+                    ->since()
                     ->sortable()
-                    ->since(),
-
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
+                    ->tooltip(fn(Tenant $record): string => $record->created_at),
             ])
             ->filters([
                 //
@@ -73,16 +75,16 @@ class TenantResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\DomainsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTenants::route('/'),
+            'index'  => Pages\ListTenants::route('/'),
             'create' => Pages\CreateTenant::route('/create'),
-            'edit' => Pages\EditTenant::route('/{record}/edit'),
+            'edit'   => Pages\EditTenant::route('/{record}/edit'),
         ];
     }
 
@@ -93,6 +95,6 @@ class TenantResource extends Resource
 
     protected static function getNavigationSort(): ?int
     {
-        return 10;
+        return 1;
     }
 }

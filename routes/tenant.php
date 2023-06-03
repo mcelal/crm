@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Auth\VerifyEmailController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
+use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -18,6 +21,14 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 */
 
+Route::group(['prefix' => config('sanctum.prefix', 'sanctum')], static function () {
+    Route::get('/csrf-cookie', [CsrfCookieController::class, 'show'])
+        ->middleware([
+            'web',
+            InitializeTenancyByDomain::class // Use tenancy initialization middleware of your choice
+        ])->name('sanctum.csrf-cookie');
+});
+
 Route::group([
 //    'prefix'     => '/{tenant}',
     'middleware' => [
@@ -28,5 +39,7 @@ Route::group([
 ], function () {
     Route::get('/', function () {
         return 'Tenant <b>' . tenant('id') . '</b>';
-    });
+    })->name('tenant.index');
 });
+
+require __DIR__.'/tenant_api.php';

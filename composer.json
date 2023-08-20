@@ -20,6 +20,7 @@
         "barryvdh/laravel-debugbar": "^3.8",
         "doctrine/dbal": "^3.6",
         "fakerphp/faker": "^1.9.1",
+        "filament/upgrade": "^3.0-stable",
         "laradumps/laradumps": "^1.9",
         "laravel/breeze": "^1.19",
         "laravel/pint": "^1.0",
@@ -71,6 +72,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

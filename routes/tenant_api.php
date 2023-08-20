@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Domains\Auth\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\InitializeTenancyByRequestData;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,18 +23,16 @@ Route::name('tenancy.')
     ->middleware([
         'web',
         'api',
-        InitializeTenancyByDomain::class
+        InitializeTenancyByRequestData::class,
+//        InitializeTenancyByDomain::class
     ])
     ->prefix('/api/v1')
     ->group(static function () {
         Route::name('auth.')
             ->prefix('/auth')
             ->group(static function () {
-                Route::post('login', [AuthController::class, 'login'])
-                    ->name('login');
-
-                Route::post('register', [AuthController::class, 'register'])
-                    ->name('register');
+                Route::post('login', [AuthController::class, 'login'])->name('login');
+                Route::post('register', [AuthController::class, 'register'])->name('register');
 
                 Route::middleware([
                     'auth',
@@ -47,4 +46,7 @@ Route::name('tenancy.')
                     });
 
             });
+
+        Route::get('/users', fn() => response()->json(\App\Models\User::all()));
+        Route::post('/users', [\App\Http\Controllers\UserController::class, 'store']);
     });

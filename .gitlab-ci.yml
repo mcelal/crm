@@ -1,0 +1,68 @@
+stages:
+  - build
+  - test
+  - deploy
+
+image: lorisleiva/laravel-docker:latest
+
+composer:
+  stage: build
+  script:
+    - composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+    - cp .env.example .env
+    - php artisan key:generate
+  artifacts:
+    expire_in: 2 days
+    paths:
+      - vendor/
+      - .env
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-composer
+    paths:
+      - vendor/
+
+npm:
+  stage: build
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-npm
+    paths:
+      - node_modules/
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    expire_in: 2 days
+    paths:
+      - node_modules/
+      - public/css/
+      - public/js/
+
+phpunit:
+  stage: test
+  dependencies:
+    - composer
+  script:
+    - php artisan test
+
+codestyle:
+  stage: test
+  script:
+    - phpcs -n --runtime-set ignore_warnings_on_exit true --standard=phpcs.xml .
+
+.init_ssh: &init_ssh |
+  eval $(ssh-agent -s)
+  echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  mkdir -p ~/.ssh
+  chmod 700 ~/.ssh
+  [[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
+staging:
+  stage: deploy
+  script:
+    - *init_ssh
+    - ssh ubuntu@${SERVER_IP} "hostname && echo 'Welcome!!!' > welcome.txt"
+  environment:
+    name: staging
+    url: http://crm.mcelal.dev
+  only:
+    - main

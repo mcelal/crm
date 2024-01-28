@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Stancl\Tenancy\Database\Models\Domain as TenantDomain;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Stancl\Tenancy\Database\Models\Domain as StanclDomain;
 
-class Domain extends TenantDomain
+class Domain extends StanclDomain
 {
-    //
+    use HasFactory;
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\TestingJob;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,7 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return redirect()->route('filament.pages.dashboard');
-});
+    return view('welcome');
+})->name('welcome');
 
-require __DIR__.'/auth.php';
+Route::get('/test-job', function () {
+    TestingJob::dispatch();
+});

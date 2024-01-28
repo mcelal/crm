@@ -11,61 +11,41 @@ use Illuminate\Support\Facades\Route;
 class RouteServiceProvider extends ServiceProvider
 {
     /**
-     * The path to the "home" route for your application.
+     * The path to your application's "home" route.
      *
      * Typically, users are redirected here after authentication.
      *
      * @var string
      */
-    public const HOME = '/panel';
+    public const HOME = '/';
 
     /**
      * Define your route model bindings, pattern filters, and other route configuration.
      */
     public function boot(): void
     {
-        $this->configureRateLimiting();
-
-        $this->routes(function () {
-            $this->mapApiRoutes();
-
-            $this->mapWebRoutes();
-
-            $this->mapPanelRoutes();
-        });
-    }
-
-    /**
-     * Configure the rate limiters for the application.
-     */
-    protected function configureRateLimiting(): void
-    {
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+
+        $this->routes(function () {
+            $this->mapApiRoutes();
+            $this->mapWebRoutes();
+        });
     }
 
-    protected function mapPanelRoutes()
-    {
-        Route::middleware(['web', 'verified'])
-            ->domain(env('FILAMENT_DOMAIN'))
-            ->prefix('panel')
-            ->name('panel.')
-            ->namespace($this->namespace)
-            ->group(base_path('routes/panel.php'));
-    }
-
-    protected function mapWebRoutes()
+    protected function mapWebRoutes(): void
     {
         foreach ($this->centralDomains() as $domain) {
             Route::middleware('web')
                 ->domain($domain)
+                ->name("{$domain}.")
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
         }
     }
 
-    protected function mapApiRoutes()
+    protected function mapApiRoutes(): void
     {
         foreach ($this->centralDomains() as $domain) {
             Route::prefix('api')

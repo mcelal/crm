@@ -1,56 +1,29 @@
-version: '3'
+version: "3.8"
 services:
-    laravel.test:
+    crm-app-php:
         build:
-            context: ./docker/8.2
-            dockerfile: Dockerfile
-            args:
-                WWWGROUP: '${WWWGROUP}'
-        image: sail-8.2/app
-        extra_hosts:
-            - 'host.docker.internal:host-gateway'
-        ports:
-            - '${APP_PORT:-80}:80'
-            - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
-        environment:
-            WWWUSER: '${WWWUSER}'
-            LARAVEL_SAIL: 1
-            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
-            XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
+            context: .
         volumes:
-            - '.:/var/www/html'
-        networks:
-            - sail
-        depends_on:
-            - pgsql
-    pgsql:
-        image: 'postgres:15'
+            - .:/var/www/html/
         ports:
-            - '${FORWARD_DB_PORT:-5432}:5432'
+            - "8081:80"
         environment:
-            PGPASSWORD: '${DB_PASSWORD:-secret}'
-            POSTGRES_DB: '${DB_DATABASE}'
-            POSTGRES_USER: '${DB_USERNAME}'
-            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
-        volumes:
-            - 'sail-pgsql:/var/lib/postgresql/data'
-            - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
-        networks:
-            - sail
-        healthcheck:
-            test:
-                - CMD
-                - pg_isready
-                - '-q'
-                - '-d'
-                - '${DB_DATABASE}'
-                - '-U'
-                - '${DB_USERNAME}'
-            retries: 3
-            timeout: 5s
-networks:
-    sail:
-        driver: bridge
-volumes:
-    sail-pgsql:
-        driver: local
+            PHP_POOL_NAME: "app-php"
+
+#    crm-app-task:
+#        image: serversideup/php:8.2-cli
+#        command: ["su", "webuser", "-c", "php artisan schedule:work"]
+#        volumes:
+#            - .:/var/www/html/
+#
+#    crm-app-queue-1:
+#        image: serversideup/php:8.2-cli
+#        command: ["su", "webuser", "-c", "php artisan queue:work"]
+#        volumes:
+#            - .:/var/www/html/
+#
+#    crm-app-queue-2:
+#        image: serversideup/php:8.2-cli
+#        command: ["su", "webuser", "-c", "php artisan queue:work"]
+#        volumes:
+#            - .:/var/www/html/

@@ -2,12 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Auth\VerifyEmailController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
-use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
-use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
-use Stancl\Tenancy\Middleware\InitializeTenancyByRequestData;
+use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 /*
@@ -22,25 +18,14 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 */
 
-Route::group([
-    'prefix' => config('sanctum.prefix', 'sanctum')
-], static function () {
-    Route::get('/csrf-cookie', [CsrfCookieController::class, 'show'])
-        ->middleware([
-            'web',
-            InitializeTenancyByRequestData::class,
-        ])->name('sanctum.csrf-cookie');
+Route::middleware([
+    'web',
+    InitializeTenancyBySubdomain::class,
+    PreventAccessFromCentralDomains::class,
+])->group(function () {
+    Route::redirect('/', '/app');
+
+    Route::get('/test', function () {
+        return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
+    })->name('tenant.test');
 });
-
-Route::group([
-    'middleware' => [
-        'web',
-        InitializeTenancyByRequestData::class,
-    ]
-], function () {
-    Route::get('/', fn() => 'Tenant: <b>' . tenant('id') . '</b>')->name('tenant.index');
-
-    Route::get('/ping', fn() => response()->json(['pong' => time()]))->name('ping');
-});
-
-require __DIR__ . '/tenant_api.php';

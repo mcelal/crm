@@ -1,26 +1,19 @@
-FROM openswoole/swoole:latest
+# Used for prod build.
+FROM serversideup/php:8.2-fpm-nginx as base
 
-### PHP Config
-RUN touch "$PHP_INI_DIR/conf.d/custom.ini" \
-    && echo "max_file_uploads=50;" >> "$PHP_INI_DIR/conf.d/custom.ini" \
-    && echo "post_max_size=20M;" >> "$PHP_INI_DIR/conf.d/custom.ini" \
-    && echo "upload_max_filesize=20M;" >> "$PHP_INI_DIR/conf.d/custom.ini" \
-    && echo "memory_limit=256M;" >> "$PHP_INI_DIR/conf.d/custom.ini" \
-    && echo "realpath_cache_size=16M;" >> "$PHP_INI_DIR/conf.d/custom.ini" \
-    && echo "realpath_cache_ttl=600;" >> "$PHP_INI_DIR/conf.d/custom.ini"
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends php8.2-pgsql git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* \
+    && git config --global --add safe.directory /var/www/html
 
-### Copy App
-COPY . /app
-WORKDIR /app
+ENV AUTORUN_ENABLED=false
+ENV SSL_MODE=off
 
-ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader --no-scripts
 
-### Install Composer Dependency
-RUN composer self-update \
-    && composer install --no-dev \
-    && php artisan octane:install --server=swoole \
-    && php artisan optimize:clear \
-    && php artisan key:generate
-
-CMD ["php", "artisan octane:start --server=swoole --host=0.0.0.0 --port=80"]
+# Run the entrypoint file.
 EXPOSE 80
+EXPOSE 443
+
+ENTRYPOINT ["/init"]

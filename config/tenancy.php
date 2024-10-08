@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Models\Domain;
 use App\Models\Tenant;
+use Stancl\Tenancy\Database\Models\Domain;
 
 return [
     'tenant_model' => Tenant::class,
@@ -17,8 +17,8 @@ return [
      * Only relevant if you're using the domain or subdomain identification middleware.
      */
     'central_domains' => [
-//        '127.0.0.1',
-//        'localhost',
+        '127.0.0.1',
+        'localhost',
         'crm.test',
     ],
 
@@ -52,7 +52,7 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => 'crm_',
+        'prefix' => 'tenant',
         'suffix' => '',
 
         /**
@@ -104,7 +104,7 @@ return [
         'disks' => [
             'local',
             'public',
-            's3',
+            // 's3',
         ],
 
         /**
@@ -113,7 +113,7 @@ return [
          * See https://tenancyforlaravel.com/docs/v3/tenancy-bootstrappers/#filesystem-tenancy-boostrapper
          */
         'root_override' => [
-            // Disks whose roots should be overriden after storage_path() is suffixed.
+            // Disks whose roots should be overridden after storage_path() is suffixed.
             'local' => '%storage_path%/app/',
             'public' => '%storage_path%/app/public/',
         ],

@@ -4,11 +4,11 @@
 /public/hot
 /public/storage
 /storage/*.key
-/storage/debugbar
 /vendor
 .env
 .env.backup
 .env.production
+.phpactor.json
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -18,7 +18,4 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-
-# OS Files.
-.DS_Store
-Thumbs.db
+/.zed

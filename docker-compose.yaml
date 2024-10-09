@@ -6,5 +6,4 @@ services:
       - "SERVER_NAME=:80"
     ports:
       - "8081:80"
-    labels:
-      - 'traefik.http.routers.https-0-hkgwkcs408o4gc4swgc8c88g-crm-franken.rule=Host(`crm.sirketim.dev`, `{subdomain:[a-zA-Z0-9-]+}.crm.sirketim.dev`) && PathPrefix(`/`)'
+  w

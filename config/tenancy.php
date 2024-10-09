@@ -18,9 +18,9 @@ return [
      */
     'central_domains' => [
         '127.0.0.1',
-        'localhost',
-        'crm.test',
-        'crm.sirketim.dev',
+        //        'localhost',
+        //        'crm.test',
+        //        'crm.sirketim.dev',
     ],
 
     /**

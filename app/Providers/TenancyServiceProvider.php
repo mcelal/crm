@@ -7,11 +7,13 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 use Stancl\JobPipeline\JobPipeline;
 use Stancl\Tenancy\Events;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
+use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
 class TenancyServiceProvider extends ServiceProvider
 {
@@ -125,6 +127,21 @@ class TenancyServiceProvider extends ServiceProvider
                 Route::namespace(static::$controllerNamespace)
                     ->group(base_path('routes/tenant.php'));
             }
+
+            InitializeTenancyBySubdomain::$onFail = function ($exception, $request, $next) {
+                return redirect()->route('home');
+            };
+
+            if (! in_array(request()->getHost(), config('tenancy.central_domains'))) {
+                Livewire::setUpdateRoute(function ($handle) {
+                    return Route::post('/livewire/update', $handle)
+                        ->middleware([
+                            'web',
+                            InitializeTenancyBySubdomain::class,
+                            Middleware\PreventAccessFromCentralDomains::class,
+                        ]);
+                });
+            }
         });
     }
 
@@ -135,7 +152,7 @@ class TenancyServiceProvider extends ServiceProvider
             Middleware\PreventAccessFromCentralDomains::class,
 
             Middleware\InitializeTenancyByDomain::class,
-            Middleware\InitializeTenancyBySubdomain::class,
+            InitializeTenancyBySubdomain::class,
             Middleware\InitializeTenancyByDomainOrSubdomain::class,
             Middleware\InitializeTenancyByPath::class,
             Middleware\InitializeTenancyByRequestData::class,

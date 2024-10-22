@@ -26,5 +26,5 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
 ])
     ->group(function () {
-        Route::redirect('/', 'app/');
+        Route::redirect('/', 'app/')->name('redirect-app');
     });

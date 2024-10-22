@@ -132,16 +132,16 @@ class TenancyServiceProvider extends ServiceProvider
                 return redirect()->route('home');
             };
 
-            if (! in_array(request()->getHost(), config('tenancy.central_domains'))) {
-                Livewire::setUpdateRoute(function ($handle) {
-                    return Route::post('/livewire/update', $handle)
-                        ->middleware([
-                            'web',
-                            InitializeTenancyBySubdomain::class,
-                            Middleware\PreventAccessFromCentralDomains::class,
-                        ]);
-                });
-            }
+//            if (! in_array(request()->getHost(), config('tenancy.central_domains'))) {
+//                Livewire::setUpdateRoute(function ($handle) {
+//                    return Route::post('/livewire/update', $handle)
+//                        ->middleware([
+//                            'web',
+//                            InitializeTenancyBySubdomain::class,
+//                            Middleware\PreventAccessFromCentralDomains::class,
+//                        ]);
+//                });
+//            }
         });
     }
 

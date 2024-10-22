@@ -4,6 +4,7 @@ namespace App\Filament\App\Resources;
 
 use App\Filament\App\Resources\UserResource\Pages;
 use App\Models\User;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -19,7 +20,10 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                //
+                FileUpload::make('avatar')
+                    ->image()
+                    ->imageEditor()
+                    ->previewable(),
             ]);
     }
 

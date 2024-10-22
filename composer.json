@@ -10,8 +10,10 @@
         "laravel/framework": "^11.9",
         "laravel/horizon": "^5.29",
         "laravel/pulse": "^1.2",
+        "laravel/sanctum": "^4.0",
         "laravel/telescope": "^5.2",
         "laravel/tinker": "^2.9",
+        "opcodesio/log-viewer": "^3.11",
         "stancl/tenancy": "^3.8"
     },
     "require-dev": {

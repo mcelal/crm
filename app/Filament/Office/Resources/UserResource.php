@@ -2,8 +2,11 @@
 
 namespace App\Filament\Office\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Office\Resources\UserResource\Pages\CreateUser;
+use App\Filament\Office\Resources\UserResource\Pages\EditUser;
+use App\Filament\Office\Resources\UserResource\Pages\ListUsers;
 use App\Models\User;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -19,7 +22,9 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                //
+                FileUpload::make('avatar')
+                    ->image()
+                    ->imageEditor(),
             ]);
     }
 
@@ -53,9 +58,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => \App\Filament\Office\Resources\UserResource\Pages\ListUsers::route('/'),
-            'create' => \App\Filament\Office\Resources\UserResource\Pages\CreateUser::route('/create'),
-            'edit' => \App\Filament\Office\Resources\UserResource\Pages\EditUser::route('/{record}/edit'),
+            'index' => ListUsers::route('/'),
+            'create' => CreateUser::route('/create'),
+            'edit' => EditUser::route('/{record}/edit'),
         ];
     }
 }

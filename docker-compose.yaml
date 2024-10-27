@@ -5,5 +5,26 @@ services:
     environment:
       - "SERVER_NAME=:80"
     ports:
-      - "8081:80"
-  w
+      - "80:80"
+    networks:
+      - crm
+
+  horizon:
+    image: serversideup/php:8.3-cli-bookworm
+    command: ["php", "/var/www/html/artisan", "horizon"]
+    stop_signal: SIGTERM
+    healthcheck:
+      test: ["CMD", "healthcheck-horizon"]
+      start_period: 10s
+    volumes:
+      - .:/var/www/html
+
+  cron:
+    image: serversideup/php:8.3-cli-bookworm
+    command: [ "php", "/var/www/html/artisan", "schedule:work" ]
+    stop_signal: SIGTERM
+    healthcheck:
+      test: [ "CMD", "healthcheck-schedule" ]
+      start_period: 10s
+    volumes:
+      - .:/var/www/html

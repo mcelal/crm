@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\Tenant;
+use App\Providers\FilesystemTenancyBootstrapper;
 use Stancl\Tenancy\Database\Models\Domain;
 
 return [
@@ -31,8 +32,8 @@ return [
     'bootstrappers' => [
         Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class,
-//        Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
-        \App\Providers\FilesystemTenancyBootstrapper::class,
+        //        Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
+        FilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
     ],

@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Features\SupportFileUploads\FilePreviewController;
 use Livewire\Livewire;
@@ -25,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (env('APP_ENV') === 'production') {
+            URL::forceScheme('https');
+        }
+
         Gate::define('viewPulse', function (User $user) {
             return $user->email_verified_at;
         });
@@ -33,11 +39,11 @@ class AppServiceProvider extends ServiceProvider
         TenantAssetsController::$tenancyMiddleware = InitializeTenancyBySubdomain::class;
 
         Livewire::setUpdateRoute(function ($handle) {
-            return \Illuminate\Support\Facades\Route::post('/livewire/update', $handle)
+            return Route::post('/livewire/update', $handle)
                 ->middleware(
                     'web',
                     'universal',
-                    InitializeTenancyBySubdomain::class, // or whatever tenancy middleware you use
+                    InitializeTenancyBySubdomain::class,
                 );
         });
     }
